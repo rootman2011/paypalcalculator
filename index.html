@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Comisiones PayPal</title>
+  <meta name="description" content="Calcula cuánto debes enviar o cuánto recibirás después de las comisiones de PayPal." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💸</text></svg>">
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+  <main class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
+      <h1 class="text-3xl font-bold mb-2 text-center text-blue-700">Calculadora de Comisiones PayPal</h1>
+      <p class="mb-6 text-gray-600 text-center">Calcula cuánto debes enviar o cuánto recibirás después de las comisiones.</p>
+      <form id="paypal-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium" for="monto">Monto a enviar o recibir</label>
+          <input type="number" step="0.01" min="0" id="monto" class="mt-1 block w-full rounded border-gray-300 focus:ring-blue-400 focus:border-blue-400" placeholder="Ej: 100" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="tipo">Tipo de cálculo</label>
+          <select id="tipo" class="mt-1 block w-full rounded border-gray-300 focus:ring-blue-400 focus:border-blue-400">
+            <option value="recibir">¿Cuánto recibiré después de comisión?</option>
+            <option value="enviar">¿Cuánto debo enviar para que llegue el monto?</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="porcentaje">Comisión % (por defecto 5.4%)</label>
+          <input type="number" step="0.01" min="0" max="100" id="porcentaje" class="mt-1 block w-full rounded border-gray-300 focus:ring-blue-400 focus:border-blue-400" value="5.4">
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="fija">Comisión fija (por defecto 0.30 USD)</label>
+          <input type="number" step="0.01" min="0" id="fija" class="mt-1 block w-full rounded border-gray-300 focus:ring-blue-400 focus:border-blue-400" value="0.30">
+        </div>
+        <button type="submit" class="w-full bg-blue-700 text-white rounded py-2 font-bold hover:bg-blue-800 transition">Calcular</button>
+      </form>
+      <div class="mt-6 text-center">
+        <div id="resultado" class="text-xl font-bold text-green-600"></div>
+      </div>
+    </div>
+  </main>
+  <script>
+    document.getElementById('paypal-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const monto = parseFloat(document.getElementById('monto').value);
+      const tipo = document.getElementById('tipo').value;
+      const porcentaje = parseFloat(document.getElementById('porcentaje').value) / 100;
+      const fija = parseFloat(document.getElementById('fija').value);
+      let resultado = '';
+      if (tipo === 'recibir') {
+        const recibido = monto - (monto * porcentaje + fija);
+        resultado = `Recibirás <span class="text-blue-700">$${recibido.toFixed(2)}</span> después de comisión.`;
+      } else {
+        const enviar = (monto + fija) / (1 - porcentaje);
+        resultado = `Debes enviar <span class="text-blue-700">$${enviar.toFixed(2)}</span> para que el destinatario reciba ${monto}.`;
+      }
+      document.getElementById('resultado').innerHTML = resultado;
+    });
+  </script>
+</body>
+</html>
