@@ -4,59 +4,133 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calculadora de Comisiones PayPal</title>
-  <meta name="description" content="Calcula cuánto debes enviar o cuánto recibirás después de las comisiones de PayPal." />
+  <meta name="description" content="Calcula cuánto necesitas enviar para que llegue una cantidad exacta, o cuánto recibirás en PayPal." />
+  <script>
+    // Tema claro/oscuro antes de cargar el contenido
+    (function() {
+      const theme = localStorage.getItem('theme') || 'light';
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💸</text></svg>">
+  <style>
+    :root {
+      --primary: 202 80% 54%;
+      --primary-focus: 202 80% 47%;
+      --secondary: 220 8% 52%;
+      --base-100: 0 0% 100%;
+      --base-200: 225 17% 96%;
+      --base-content: 215 28% 17%;
+    }
+    .dark {
+      --primary: 202 80% 54%;
+      --primary-focus: 202 80% 47%;
+      --secondary: 215 14% 34%;
+      --base-100: 215 28% 17%;
+      --base-200: 222 39% 11%;
+      --base-content: 216 33% 97%;
+    }
+    body {
+      background-color: hsl(var(--base-200));
+      color: hsl(var(--base-content));
+      transition: background-color 0.3s, color 0.3s;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans">
-  <main class="min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-      <h1 class="text-3xl font-bold mb-2 text-center text-blue-700">Calculadora de Comisiones PayPal</h1>
-      <p class="mb-6 text-gray-600 text-center">Calcula cuánto debes enviar o cuánto recibirás después de las comisiones.</p>
-      <form id="paypal-form" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium" for="monto">Monto a enviar o recibir</label>
-          <input type="number" step="0.01" min="0" id="monto" class="mt-1 block w-full rounded border-gray-300 focus:ring-blue-400 focus:border-blue-400" placeholder="Ej: 100" required>
+<body class="font-sans min-h-screen flex items-center justify-center">
+  <main class="w-full max-w-md mx-auto bg-base-100 rounded-2xl shadow-2xl overflow-hidden my-8">
+    <div class="p-8">
+      <div class="flex items-center justify-center mb-6">
+        <svg class="h-8 w-8 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M10 3h5.5C18.537 3 21 5.463 21 8.5S18.537 14 15.5 14H10v7H7V3h3zm3.5 8c1.38 0 2.5-1.12 2.5-2.5S14.88 6 13.5 6H10v5h3.5z"/><line x1="12" y1="1" x2="12" y2="23" stroke-width="3.5" class="stroke-base-100"/><line x1="12" y1="1" x2="12" y2="23" stroke-width="1.5" stroke="currentColor"/></svg>
+        <h1 class="text-2xl sm:text-3xl font-bold text-base-content ml-3">Calculadora PayPal</h1>
+      </div>
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <label for="amountToSend" class="text-sm font-medium text-gray-400">Se envía (USD)</label>
+          <div class="relative">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>
+            </div>
+            <input type="number" id="amountToSend" name="amountToSend" class="w-full pl-10 pr-4 py-3 text-2xl font-semibold text-base-content bg-base-200 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" autocomplete="off" inputmode="decimal" value="5.00"/>
+          </div>
         </div>
-        <div>
-          <label class="block text-sm font-medium" for="tipo">Tipo de cálculo</label>
-          <select id="tipo" class="mt-1 block w-full rounded border-gray-300 focus:ring-blue-400 focus:border-blue-400">
-            <option value="recibir">¿Cuánto recibiré después de comisión?</option>
-            <option value="enviar">¿Cuánto debo enviar para que llegue el monto?</option>
-          </select>
+        <div class="space-y-2">
+          <label for="amountToReceive" class="text-sm font-medium text-gray-400">La cuenta destino recibe (USD)</label>
+          <div class="relative">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2-3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>
+            </div>
+            <input type="number" id="amountToReceive" name="amountToReceive" class="w-full pl-10 pr-4 py-3 text-2xl font-semibold text-base-content bg-base-200 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" autocomplete="off" inputmode="decimal"/>
+          </div>
         </div>
-        <div>
-          <label class="block text-sm font-medium" for="porcentaje">Comisión % (por defecto 5.4%)</label>
-          <input type="number" step="0.01" min="0" max="100" id="porcentaje" class="mt-1 block w-full rounded border-gray-300 focus:ring-blue-400 focus:border-blue-400" value="5.4">
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="fija">Comisión fija (por defecto 0.30 USD)</label>
-          <input type="number" step="0.01" min="0" id="fija" class="mt-1 block w-full rounded border-gray-300 focus:ring-blue-400 focus:border-blue-400" value="0.30">
-        </div>
-        <button type="submit" class="w-full bg-blue-700 text-white rounded py-2 font-bold hover:bg-blue-800 transition">Calcular</button>
-      </form>
+      </div>
       <div class="mt-6 text-center">
-        <div id="resultado" class="text-xl font-bold text-green-600"></div>
+        <p class="text-xs text-gray-500">
+          Cálculo basado en una tarifa estimada de <span class="font-semibold">5.4% + $0.30</span> por transacción. Las tarifas pueden variar.
+        </p>
       </div>
     </div>
   </main>
   <script>
-    document.getElementById('paypal-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const monto = parseFloat(document.getElementById('monto').value);
-      const tipo = document.getElementById('tipo').value;
-      const porcentaje = parseFloat(document.getElementById('porcentaje').value) / 100;
-      const fija = parseFloat(document.getElementById('fija').value);
-      let resultado = '';
-      if (tipo === 'recibir') {
-        const recibido = monto - (monto * porcentaje + fija);
-        resultado = `Recibirás <span class="text-blue-700">$${recibido.toFixed(2)}</span> después de comisión.`;
-      } else {
-        const enviar = (monto + fija) / (1 - porcentaje);
-        resultado = `Debes enviar <span class="text-blue-700">$${enviar.toFixed(2)}</span> para que el destinatario reciba ${monto}.`;
+    // Utilidad de selección tipo $
+    function $(sel) {
+      return document.querySelector(sel);
+    }
+
+    const PAYPAL_PERCENTAGE_FEE = 0.054;
+    const PAYPAL_FIXED_FEE = 0.30;
+
+    const sendInput = $('#amountToSend');
+    const receiveInput = $('#amountToReceive');
+
+    const calculateReceivedAmount = (amount) => {
+      if (isNaN(amount) || amount <= 0) return 0;
+      const fee = (amount * PAYPAL_PERCENTAGE_FEE) + PAYPAL_FIXED_FEE;
+      return Math.max(0, amount - fee);
+    };
+
+    const calculateSendAmount = (amount) => {
+      if (isNaN(amount) || amount <= 0) return 0;
+      return Math.max(0, (amount + PAYPAL_FIXED_FEE) / (1 - PAYPAL_PERCENTAGE_FEE));
+    };
+
+    const updateInputs = (source, value) => {
+      const numericValue = parseFloat(value);
+      if(isNaN(numericValue) || numericValue <= 0) {
+        sendInput.value = '';
+        receiveInput.value = '';
+        return;
       }
-      document.getElementById('resultado').innerHTML = resultado;
+      if(source === 'send') {
+        sendInput.value = numericValue.toFixed(2);
+        receiveInput.value = calculateReceivedAmount(numericValue).toFixed(2);
+      } else {
+        receiveInput.value = numericValue.toFixed(2);
+        sendInput.value = calculateSendAmount(numericValue).toFixed(2);
+      }
+    };
+
+    // Inicialización
+    receiveInput.value = calculateReceivedAmount(parseFloat(sendInput.value)).toFixed(2);
+
+    sendInput.addEventListener('input', (e) => {
+      const value = e.target.value;
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        receiveInput.value = calculateReceivedAmount(parseFloat(value)).toFixed(2);
+      }
     });
+
+    receiveInput.addEventListener('input', (e) => {
+      const value = e.target.value;
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        sendInput.value = calculateSendAmount(parseFloat(value)).toFixed(2);
+      }
+    });
+
+    sendInput.addEventListener('blur', (e) => updateInputs('send', e.target.value || '0.00'));
+    receiveInput.addEventListener('blur', (e) => updateInputs('receive', e.target.value || '0.00'));
   </script>
 </body>
 </html>
