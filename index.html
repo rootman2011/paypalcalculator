@@ -3,134 +3,193 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- SEO Metatags -->
   <title>Calculadora de Comisiones PayPal</title>
-  <meta name="description" content="Calcula cuánto necesitas enviar para que llegue una cantidad exacta, o cuánto recibirás en PayPal." />
+  <meta name="description" content="Calcula fácilmente las comisiones de PayPal para enviar o recibir dinero. Averigua la cantidad exacta a enviar o recibir.">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💸</text></svg>">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Tema claro/oscuro antes de cargar el contenido
+    // Evita el FOUC (Flash Of Unstyled Content) aplicando el tema antes de que se renderice la página.
     (function() {
-      const theme = localStorage.getItem('theme') || 'light';
-      if (theme === 'dark') {
+      if (localStorage.getItem('theme') === 'dark') {
         document.documentElement.classList.add('dark');
       }
     })();
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root {
-      --primary: 202 80% 54%;
-      --primary-focus: 202 80% 47%;
-      --secondary: 220 8% 52%;
-      --base-100: 0 0% 100%;
-      --base-200: 225 17% 96%;
-      --base-content: 215 28% 17%;
+    :root { /* Light Mode */
+      --primary: 167 79% 43%;        /* teal-500: #14b8a6 */
+      --base-100: 0 0% 100%;           /* white */
+      --base-200: 225 17% 96%;        /* gray-100: #f3f4f6 */
+      --base-content: 215 28% 17%;    /* gray-800: #1f2937 */
+      --secondary: 220 8% 52%;        /* gray-500: #6b7280 */
     }
-    .dark {
-      --primary: 202 80% 54%;
-      --primary-focus: 202 80% 47%;
-      --secondary: 215 14% 34%;
-      --base-100: 215 28% 17%;
-      --base-200: 222 39% 11%;
-      --base-content: 216 33% 97%;
+    .dark { /* Dark Mode */
+      --primary: 167 79% 43%;        /* teal-500: #14b8a6 */
+      --base-100: 215 28% 17%;        /* gray-800: #1f2937 */
+      --base-200: 222 39% 11%;        /* gray-900: #111827 */
+      --base-content: 216 33% 97%;    /* gray-50:  #f9fafb */
+      --secondary: 215 14% 34%;       /* gray-700: #374151 */
     }
     body {
       background-color: hsl(var(--base-200));
       color: hsl(var(--base-content));
-      transition: background-color 0.3s, color 0.3s;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
   </style>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'primary': 'hsl(var(--primary))',
+            'primary-focus': 'hsl(var(--primary-focus))',
+            'secondary': 'hsl(var(--secondary))',
+            'base-100': 'hsl(var(--base-100))',
+            'base-200': 'hsl(var(--base-200))',
+            'base-content': 'hsl(var(--base-content))',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body class="font-sans min-h-screen flex items-center justify-center">
-  <main class="w-full max-w-md mx-auto bg-base-100 rounded-2xl shadow-2xl overflow-hidden my-8">
-    <div class="p-8">
-      <div class="flex items-center justify-center mb-6">
-        <svg class="h-8 w-8 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M10 3h5.5C18.537 3 21 5.463 21 8.5S18.537 14 15.5 14H10v7H7V3h3zm3.5 8c1.38 0 2.5-1.12 2.5-2.5S14.88 6 13.5 6H10v5h3.5z"/><line x1="12" y1="1" x2="12" y2="23" stroke-width="3.5" class="stroke-base-100"/><line x1="12" y1="1" x2="12" y2="23" stroke-width="1.5" stroke="currentColor"/></svg>
-        <h1 class="text-2xl sm:text-3xl font-bold text-base-content ml-3">Calculadora PayPal</h1>
-      </div>
-      <div class="space-y-6">
-        <div class="space-y-2">
-          <label for="amountToSend" class="text-sm font-medium text-gray-400">Se envía (USD)</label>
-          <div class="relative">
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>
-            </div>
-            <input type="number" id="amountToSend" name="amountToSend" class="w-full pl-10 pr-4 py-3 text-2xl font-semibold text-base-content bg-base-200 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" autocomplete="off" inputmode="decimal" value="5.00"/>
-          </div>
-        </div>
-        <div class="space-y-2">
-          <label for="amountToReceive" class="text-sm font-medium text-gray-400">La cuenta destino recibe (USD)</label>
-          <div class="relative">
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2-3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>
-            </div>
-            <input type="number" id="amountToReceive" name="amountToReceive" class="w-full pl-10 pr-4 py-3 text-2xl font-semibold text-base-content bg-base-200 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" autocomplete="off" inputmode="decimal"/>
-          </div>
+<body class="font-sans flex flex-col min-h-screen">
+
+  <header class="bg-base-100 shadow-md sticky top-0 z-50">
+    <nav class="container mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+        <a href="#" class="flex items-center space-x-3">
+            <span class="text-2xl">💸</span>
+            <span class="text-xl font-bold text-base-content whitespace-nowrap">Calculadora PayPal</span>
+        </a>
+        <div class="flex items-center">
+          <button id="theme-switcher" class="p-2 rounded-full text-base-content hover:bg-secondary/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-primary" aria-label="Cambiar tema">
+              <span id="theme-icon-container"></span>
+          </button>
         </div>
       </div>
-      <div class="mt-6 text-center">
-        <p class="text-xs text-gray-500">
-          Cálculo basado en una tarifa estimada de <span class="font-semibold">5.4% + $0.30</span> por transacción. Las tarifas pueden variar.
-        </p>
-      </div>
+    </nav>
+  </header>
+
+  <main class="flex-grow container mx-auto px-4 py-8 md:py-12 flex items-center justify-center">
+    <div class="w-full max-w-md mx-auto bg-base-100 rounded-2xl shadow-2xl overflow-hidden">
+        <div class="p-8">
+            <div class="flex items-center justify-center mb-6">
+                <svg class="h-10 w-10 text-primary" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" strokeLinecap="round"><path d="M10 3h5.5C18.537 3 21 5.463 21 8.5S18.537 14 15.5 14H10v7H7V3h3zm3.5 8c1.38 0 2.5-1.12 2.5-2.5S14.88 6 13.5 6H10v5h3.5z" /><line x1="12" y1="1" x2="12" y2="23" strokeWidth="3.5" class="stroke-base-100" /><line x1="12" y1="1" x2="12" y2="23" strokeWidth="1.5" stroke="currentColor" /></svg>
+                <h1 class="text-2xl sm:text-3xl font-bold text-base-content ml-3">Calculadora PayPal</h1>
+            </div>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label for="amountToSend" class="text-sm font-medium text-gray-400">Tú envías (USD)</label>
+                    <div class="relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg></div>
+                        <input type="number" id="amountToSend" class="w-full pl-10 pr-4 py-3 text-2xl font-semibold text-base-content bg-base-200 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" autocomplete="off" inputMode="decimal" value="5.00"/>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label for="amountToReceive" class="text-sm font-medium text-gray-400">El destinatario recibe (USD)</label>
+                    <div class="relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg></div>
+                        <input type="number" id="amountToReceive" class="w-full pl-10 pr-4 py-3 text-2xl font-semibold text-base-content bg-base-200 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" autocomplete="off" inputMode="decimal"/>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 text-center">
+                <p class="text-xs text-gray-500">
+                    Cálculo basado en una tarifa de <span class="font-semibold">5.4% + $0.30</span>. Las tarifas pueden variar.
+                </p>
+            </div>
+        </div>
     </div>
   </main>
-  <script>
-    // Utilidad de selección tipo $
-    function $(sel) {
-      return document.querySelector(sel);
-    }
 
+  <footer class="bg-base-100 border-t border-secondary/50 mt-auto">
+    <div class="container mx-auto px-4 py-6 text-center text-gray-400">
+      <p id="footer-copyright"></p>
+      <p class="text-sm mt-1">Creado con ❤️ y código.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    // --- CONSTANTS ---
     const PAYPAL_PERCENTAGE_FEE = 0.054;
     const PAYPAL_FIXED_FEE = 0.30;
-
-    const sendInput = $('#amountToSend');
-    const receiveInput = $('#amountToReceive');
-
-    const calculateReceivedAmount = (amount) => {
-      if (isNaN(amount) || amount <= 0) return 0;
-      const fee = (amount * PAYPAL_PERCENTAGE_FEE) + PAYPAL_FIXED_FEE;
-      return Math.max(0, amount - fee);
+    const ICONS = {
+        sun: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-13.66l-.7.7M4.34 19.66l-.7.7M21 12h-1M3 12H2m16.66 7.66l-.7-.7M4.34 4.34l-.7-.7" /></svg>`,
+        moon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 118.646 3.646 7 7 0 0020.354 15.354z" /></svg>`,
     };
 
-    const calculateSendAmount = (amount) => {
-      if (isNaN(amount) || amount <= 0) return 0;
-      return Math.max(0, (amount + PAYPAL_FIXED_FEE) / (1 - PAYPAL_PERCENTAGE_FEE));
+    // --- DOM ELEMENTS ---
+    const sendInput = document.getElementById('amountToSend');
+    const receiveInput = document.getElementById('amountToReceive');
+    const themeSwitcher = document.getElementById('theme-switcher');
+    const themeIconContainer = document.getElementById('theme-icon-container');
+    const footerCopyright = document.getElementById('footer-copyright');
+
+    // --- LOGIC ---
+    const calculate = {
+        received: (amount) => (amount * (1 - PAYPAL_PERCENTAGE_FEE)) - PAYPAL_FIXED_FEE,
+        send: (amount) => (amount + PAYPAL_FIXED_FEE) / (1 - PAYPAL_PERCENTAGE_FEE)
     };
+    
+    function updateCalculations(source) {
+        const isSend = source === 'send';
+        const sourceEl = isSend ? sendInput : receiveInput;
+        const targetEl = isSend ? receiveInput : sendInput;
+        const calcFn = isSend ? calculate.received : calculate.send;
 
-    const updateInputs = (source, value) => {
-      const numericValue = parseFloat(value);
-      if(isNaN(numericValue) || numericValue <= 0) {
-        sendInput.value = '';
-        receiveInput.value = '';
-        return;
-      }
-      if(source === 'send') {
-        sendInput.value = numericValue.toFixed(2);
-        receiveInput.value = calculateReceivedAmount(numericValue).toFixed(2);
-      } else {
-        receiveInput.value = numericValue.toFixed(2);
-        sendInput.value = calculateSendAmount(numericValue).toFixed(2);
-      }
-    };
+        const value = parseFloat(sourceEl.value);
 
-    // Inicialización
-    receiveInput.value = calculateReceivedAmount(parseFloat(sendInput.value)).toFixed(2);
+        if (isNaN(value) || !sourceEl.value) {
+            targetEl.value = '';
+            return;
+        }
 
-    sendInput.addEventListener('input', (e) => {
-      const value = e.target.value;
-      if (value === '' || /^\d*\.?\d*$/.test(value)) {
-        receiveInput.value = calculateReceivedAmount(parseFloat(value)).toFixed(2);
-      }
-    });
+        const result = calcFn(value);
+        targetEl.value = Math.max(0, result).toFixed(2);
+    }
+    
+    function formatOnBlur(event) {
+        const value = parseFloat(event.target.value);
+        if (value > 0) {
+            event.target.value = value.toFixed(2);
+        }
+    }
 
-    receiveInput.addEventListener('input', (e) => {
-      const value = e.target.value;
-      if (value === '' || /^\d*\.?\d*$/.test(value)) {
-        sendInput.value = calculateSendAmount(parseFloat(value)).toFixed(2);
-      }
-    });
+    function updateThemeIcon() {
+        const isDark = document.documentElement.classList.contains('dark');
+        themeIconContainer.innerHTML = isDark ? ICONS.sun : ICONS.moon;
+    }
+    
+    function toggleTheme() {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        updateThemeIcon();
+    }
+    
+    // --- INITIALIZATION ---
+    function init() {
+        footerCopyright.textContent = `© ${new Date().getFullYear()} Calculadora de Comisiones PayPal. Todos los derechos reservados.`;
+        
+        sendInput.addEventListener('input', () => updateCalculations('send'));
+        receiveInput.addEventListener('input', () => updateCalculations('receive'));
+        sendInput.addEventListener('blur', formatOnBlur);
+        receiveInput.addEventListener('blur', formatOnBlur);
+        themeSwitcher.addEventListener('click', toggleTheme);
 
-    sendInput.addEventListener('blur', (e) => updateInputs('send', e.target.value || '0.00'));
-    receiveInput.addEventListener('blur', (e) => updateInputs('receive', e.target.value || '0.00'));
+        updateThemeIcon();
+        updateCalculations('send'); // Initial calculation
+    }
+
+    init();
   </script>
 </body>
 </html>
