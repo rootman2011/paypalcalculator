@@ -65,11 +65,18 @@
 
   <header class="bg-base-100 shadow-md sticky top-0 z-50">
     <nav class="container mx-auto px-4">
-      <div class="flex items-center justify-between h-16">
+      <div class="flex items-center justify-between h-16 relative">
         <a href="#" class="flex items-center space-x-3">
             <span class="text-2xl">💸</span>
-            <span class="text-xl font-bold text-base-content whitespace-nowrap">Calculadora PayPal</span>
+            <span class="text-xl font-bold text-base-content whitespace-nowrap hidden sm:block">Calculadora PayPal</span>
         </a>
+
+        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <a href="https://lordcraft.online" rel="noopener noreferrer" class="bg-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-primary">
+                Inicio
+            </a>
+        </div>
+
         <div class="flex items-center">
           <button id="theme-switcher" class="p-2 rounded-full text-base-content hover:bg-secondary/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-primary" aria-label="Cambiar tema">
               <span id="theme-icon-container"></span>
